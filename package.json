@@ -1,0 +1,13 @@
+{
+  "name": "sprash-elibrary-root",
+  "version": "1.0.0",
+  "description": "Root package for SPRASH e-Library to easily start the server.",
+  "scripts": {
+    "start": "cd server && npm start",
+    "dev": "cd server && npm run dev",
+    "install-all": "cd server && npm install",
+    "seed": "cd server && npm run seed"
+  },
+  "author": "Sparsh Balgram",
+  "license": "ISC"
+}

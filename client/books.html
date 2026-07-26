@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Browse the SPRASH e-Library. Free NCERT and school textbooks for all classes." />
+  <title>Library | SPRASH e-Library</title>
+  <link rel="icon" type="image/png" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/books.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <header id="navbar" class="navbar" role="banner"></header>
+
+  <!-- Hero Section -->
+  <div class="library-hero">
+    <div class="container">
+      <h1 class="library-hero__title">E-Library Collection</h1>
+      <p class="library-hero__subtitle">Find and read free textbooks across all classes and subjects.</p>
+    </div>
+  </div>
+
+  <!-- Search & Filters -->
+  <div class="container">
+    <div class="search-section">
+      <div class="search-bar">
+        <div class="search-bar__input-wrapper">
+          <span class="search-bar__icon">🔍</span>
+          <input type="text" id="search-input" class="search-bar__input" placeholder="Search by book name, subject, or keywords..." autocomplete="off" />
+        </div>
+        <button id="search-btn" class="search-bar__btn">Search Books</button>
+      </div>
+      
+      <div class="filters">
+        <label class="filters__label">
+          Class:
+          <select id="filter-class" class="filters__select">
+            <option value="">All Classes</option>
+            <!-- Populated dynamically by books.js -->
+          </select>
+        </label>
+        
+        <label class="filters__label">
+          Subject:
+          <select id="filter-subject" class="filters__select">
+            <option value="">All Subjects</option>
+            <!-- Populated dynamically by books.js -->
+          </select>
+        </label>
+        
+        <button id="clear-filters" class="filters__clear">Clear Filters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Books Grid -->
+  <section class="books-section">
+    <div class="container">
+      <div class="books-section__header">
+        <div id="books-count" class="books-section__count">Loading books...</div>
+      </div>
+      
+      <div id="books-grid" class="books-grid">
+        <!-- Books will be injected here via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer" role="contentinfo"></footer>
+
+  <!-- Scripts -->
+  <script src="/js/app.js"></script>
+  <script src="/js/search.js"></script>
+  <script src="/js/books.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // search suggestions setup
+      initSearchSuggestions('search-input');
+    });
+  </script>
+</body>
+</html>

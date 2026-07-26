@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Read book online at SPRASH e-Library." />
+  <title>Read Book | SPRASH e-Library</title>
+  <link rel="icon" type="image/png" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/books.css" />
+</head>
+<body class="reader-page">
+  
+  <!-- Reader Header -->
+  <header class="reader-header">
+    <div class="container reader-header__inner">
+      <a href="/books.html" class="reader-header__back" aria-label="Back to library">
+        <span>←</span> Back to Library
+      </a>
+      
+      <h1 id="reader-title" class="reader-header__title">Loading book...</h1>
+      
+      <div class="reader-header__controls">
+        <button id="btn-fullscreen" class="reader-control-btn" aria-label="Toggle full screen" title="Full Screen">⛶</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Reader Layout -->
+  <main class="container">
+    <div id="reader-content" class="reader-content">
+      
+      <!-- PDF Viewer Area -->
+      <div class="pdf-viewer">
+        <div id="pdf-viewer-empty" class="pdf-viewer__empty">
+          <div class="spinner spinner--active">
+            <div class="spinner__circle"></div>
+          </div>
+          <p class="pdf-viewer__empty-text" style="margin-top: 1rem;">Loading document...</p>
+        </div>
+        
+        <!-- Iframe will be injected here if PDF exists -->
+        <div id="pdf-container" style="display: none; width: 100%; height: 100%;"></div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="reader-sidebar">
+        <div class="reader-sidebar__card">
+          <img id="sidebar-cover" src="/images/default-cover.png" alt="Book Cover" class="reader-sidebar__cover" />
+          <h2 id="sidebar-title" class="reader-sidebar__title">Book Title</h2>
+          
+          <div class="reader-sidebar__meta">
+            <div class="reader-sidebar__meta-item">
+              <span class="reader-sidebar__meta-icon">🎓</span>
+              <div>
+                <div class="reader-sidebar__meta-label">Class</div>
+                <div id="sidebar-class" class="reader-sidebar__meta-value">-</div>
+              </div>
+            </div>
+            
+            <div class="reader-sidebar__meta-item">
+              <span class="reader-sidebar__meta-icon">📐</span>
+              <div>
+                <div class="reader-sidebar__meta-label">Subject</div>
+                <div id="sidebar-subject" class="reader-sidebar__meta-value">-</div>
+              </div>
+            </div>
+            
+            <div class="reader-sidebar__meta-item">
+              <span class="reader-sidebar__meta-icon">🌐</span>
+              <div>
+                <div class="reader-sidebar__meta-label">Language</div>
+                <div id="sidebar-lang" class="reader-sidebar__meta-value">-</div>
+              </div>
+            </div>
+          </div>
+          
+          <p id="sidebar-desc" class="reader-sidebar__desc"></p>
+        </div>
+
+        </div>
+      </aside>
+      
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initScrollEffects();
+      loadBookDetails();
+      initFullscreen();
+    });
+
+    async function loadBookDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookId = urlParams.get('id');
+
+      if (!bookId) {
+        showErrorState('Book Not Found', 'No book ID provided in the URL.');
+        return;
+      }
+
+      try {
+        const data = await fetchAPI(`/books/${bookId}`);
+        const book = data.data;
+
+        // Populate Sidebar
+        document.getElementById('reader-title').textContent = book.title;
+        document.title = `${book.title} | SPRASH e-Library`;
+        
+        document.getElementById('sidebar-title').textContent = book.title;
+        document.getElementById('sidebar-class').textContent = `Class ${book.class}`;
+        document.getElementById('sidebar-subject').textContent = book.subject;
+        document.getElementById('sidebar-lang').textContent = book.language || 'English';
+        document.getElementById('sidebar-desc').textContent = book.description || 'No description available.';
+        
+        if (book.coverImage) {
+          const coverImg = document.getElementById('sidebar-cover');
+          coverImg.src = book.coverImage;
+          coverImg.onerror = () => coverImg.src = '/images/default-cover.png';
+        }
+
+        // Render PDF Viewer
+        renderPDF(book.pdfPath);
+
+      } catch (error) {
+        showErrorState('Failed to Load Book', 'The book you are looking for might have been removed or does not exist.');
+      }
+    }
+
+    function renderPDF(pdfPath) {
+      const emptyState = document.getElementById('pdf-viewer-empty');
+      const container = document.getElementById('pdf-container');
+
+      if (!pdfPath || pdfPath.trim() === '' || pdfPath.includes('placeholder')) {
+        emptyState.innerHTML = `
+          <div class="pdf-viewer__empty-icon">📄</div>
+          <h3 class="pdf-viewer__empty-title">No PDF Available</h3>
+          <p class="pdf-viewer__empty-text">The PDF content for this book has not been uploaded yet. Please check back later.</p>
+        `;
+        return;
+      }
+
+      // We have a valid PDF path, render it in iframe
+      emptyState.style.display = 'none';
+      container.style.display = 'block';
+      
+      // We append #toolbar=1&navpanes=0&scrollbar=1 to use built-in PDF viewer UI
+      container.innerHTML = `
+        <iframe 
+          src="${pdfPath}#toolbar=1&navpanes=0&scrollbar=1&view=FitH" 
+          class="pdf-viewer__frame" 
+          title="PDF Viewer"
+          allowfullscreen>
+        </iframe>
+      `;
+    }
+
+    function showErrorState(title, message) {
+      const emptyState = document.getElementById('pdf-viewer-empty');
+      if (emptyState) {
+        emptyState.innerHTML = `
+          <div class="pdf-viewer__empty-icon">⚠️</div>
+          <h3 class="pdf-viewer__empty-title">${title}</h3>
+          <p class="pdf-viewer__empty-text">${message}</p>
+          <a href="/books.html" class="btn btn--primary" style="margin-top: 1rem;">Back to Library</a>
+        `;
+      }
+      document.getElementById('reader-title').textContent = 'Book Not Found';
+    }
+
+    function initFullscreen() {
+      const btn = document.getElementById('btn-fullscreen');
+      const content = document.getElementById('reader-content');
+
+      if (!btn || !content) return;
+
+      btn.addEventListener('click', () => {
+        content.classList.toggle('reader-content--fullscreen');
+        if (content.classList.contains('reader-content--fullscreen')) {
+          btn.innerHTML = '🗗'; // Restore icon
+          btn.setAttribute('title', 'Exit Full Screen');
+        } else {
+          btn.innerHTML = '⛶'; // Maximize icon
+          btn.setAttribute('title', 'Full Screen');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
