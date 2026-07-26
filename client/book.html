@@ -118,7 +118,7 @@
         
         if (book.coverImage) {
           const coverImg = document.getElementById('sidebar-cover');
-          coverImg.src = book.coverImage;
+          coverImg.src = getAssetUrl(book.coverImage);
           coverImg.onerror = () => coverImg.src = '/images/default-cover.png';
         }
 
@@ -150,7 +150,7 @@
       // We append #toolbar=1&navpanes=0&scrollbar=1 to use built-in PDF viewer UI
       container.innerHTML = `
         <iframe 
-          src="${pdfPath}#toolbar=1&navpanes=0&scrollbar=1&view=FitH" 
+          src="${getAssetUrl(pdfPath)}#toolbar=1&navpanes=0&scrollbar=1&view=FitH" 
           class="pdf-viewer__frame" 
           title="PDF Viewer"
           allowfullscreen>
