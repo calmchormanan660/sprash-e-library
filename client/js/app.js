@@ -6,11 +6,22 @@
  */
 
 // ─── Configuration ────────────────────────────
+const API_HOST = window.API_BASE_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '');
 const APP_CONFIG = {
-  apiBase: '/api',
+  apiBase: `${API_HOST}/api`,
   siteName: 'SPRASH e-Library',
   orgName: 'Sparsh Balgram'
 };
+
+/**
+ * Utility to resolve relative upload paths to full backend URLs
+ * when frontend is hosted separately (e.g. Cloudflare Pages).
+ */
+function getAssetUrl(urlPath) {
+  if (!urlPath) return '/images/default-cover.png';
+  if (urlPath.startsWith('http://') || urlPath.startsWith('https://')) return urlPath;
+  return `${API_HOST}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`;
+}
 
 // ─── Theme System ─────────────────────────────
 /**
@@ -403,7 +414,7 @@ function renderBookCard(book) {
     <article class="book-card" data-book-id="${book._id}">
       <div class="book-card__cover">
         <img 
-          src="${book.coverImage || '/images/default-cover.png'}" 
+          src="${getAssetUrl(book.coverImage)}" 
           alt="Cover of ${book.title}"
           loading="lazy"
           onerror="this.src='/images/default-cover.png'"
