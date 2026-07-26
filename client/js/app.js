@@ -5,10 +5,12 @@
  * toast notifications, and common helpers used across all pages.
  */
 
+const BASE_URL = 'https://sprash-e-library-production.up.railway.app';
+
 // ─── Configuration ────────────────────────────
-const API_HOST = window.API_BASE_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '');
+const API_HOST = BASE_URL;
 const APP_CONFIG = {
-  apiBase: `${API_HOST}/api`,
+  apiBase: `${API_HOST.replace(/\/$/, '')}/api`,
   siteName: 'SPRASH e-Library',
   orgName: 'Sparsh Balgram'
 };
@@ -20,7 +22,9 @@ const APP_CONFIG = {
 function getAssetUrl(urlPath) {
   if (!urlPath) return '/images/default-cover.png';
   if (urlPath.startsWith('http://') || urlPath.startsWith('https://')) return urlPath;
-  return `${API_HOST}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`;
+  const cleanHost = API_HOST.replace(/\/$/, '');
+  const cleanPath = urlPath.startsWith('/') ? urlPath : `/${urlPath}`;
+  return `${cleanHost}${cleanPath}`;
 }
 
 // ─── Theme System ─────────────────────────────
@@ -69,7 +73,9 @@ function applyTheme(theme) {
  */
 async function fetchAPI(endpoint, options = {}) {
   try {
-    const url = `${APP_CONFIG.apiBase}${endpoint}`;
+    const cleanBase = APP_CONFIG.apiBase.endsWith('/') ? APP_CONFIG.apiBase.slice(0, -1) : APP_CONFIG.apiBase;
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${cleanBase}${cleanEndpoint}`;
     const config = {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
