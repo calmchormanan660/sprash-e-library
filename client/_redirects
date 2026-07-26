@@ -1,0 +1,4 @@
+# Cloudflare Pages Proxy Redirects to Railway Backend
+# Replace YOUR-RAILWAY-APP with your actual Railway app name/domain
+/api/*  https://YOUR-RAILWAY-APP.up.railway.app/api/:splat  200
+/uploads/*  https://YOUR-RAILWAY-APP.up.railway.app/uploads/:splat  200
