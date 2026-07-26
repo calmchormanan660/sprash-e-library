@@ -164,7 +164,7 @@ function renderAdminTable(books) {
         <div class="admin-table__title-cell">
           <img 
             class="admin-table__cover" 
-            src="${book.coverImage || '/images/default-cover.png'}" 
+            src="${getAssetUrl(book.coverImage)}" 
             alt="${book.title}"
             onerror="this.src='/images/default-cover.png'"
           />
